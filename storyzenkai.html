@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StoryZenkai — Read Every Manga We Covered</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0d0f;
+      --surface:  #16161a;
+      --border:   #2a2a32;
+      --ink:      #e8e8f0;
+      --muted:    #7a7a8c;
+      --red:      #e8312a;
+      --red-dim:  #9e1f1a;
+      --yellow:   #f5c518;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── SOCIAL BAR AD ── */
+    .social-bar-ad { width: 100%; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 5%;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(13,13,15,0.95);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem;
+      letter-spacing: 2px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .logo span { color: var(--red); }
+    .yt-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--red);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .yt-btn:hover { background: var(--red-dim); }
+    .yt-btn svg { width: 16px; height: 16px; fill: #fff; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 60px 5% 40px;
+      max-width: 860px;
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      line-height: 1;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--yellow);
+      -webkit-text-stroke: 0px;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 520px;
+    }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      padding: 0 5% 36px;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 16px;
+      max-width: 480px;
+    }
+    .search-box svg { width: 16px; height: 16px; fill: var(--muted); flex-shrink: 0; }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--ink);
+      font-size: 0.9rem;
+      width: 100%;
+    }
+    .search-box input::placeholder { color: var(--muted); }
+
+    /* ── AD BANNER TOP ── */
+    .ad-banner-top {
+      display: flex;
+      justify-content: center;
+      padding: 0 5% 32px;
+    }
+
+    /* ── GRID ── */
+    .grid-section { padding: 0 5% 60px; }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .manga-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    /* ── CARD ── */
+    .manga-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.18s, border-color 0.18s;
+      display: flex;
+      flex-direction: column;
+    }
+    .manga-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--red);
+    }
+    .card-cover {
+      width: 100%;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+      background: #1e1e24;
+      display: block;
+    }
+    .card-cover-placeholder {
+      width: 100%;
+      aspect-ratio: 2/3;
+      background: linear-gradient(135deg, #1e1e24 0%, #2a2a35 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 12px;
+    }
+    .card-body {
+      padding: 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+    .card-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 10px;
+    }
+    .btn-watch, .btn-read {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .btn-watch:hover, .btn-read:hover { opacity: 0.85; }
+    .btn-watch {
+      background: var(--red);
+      color: #fff;
+    }
+    .btn-read {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--border);
+    }
+    .btn-watch svg, .btn-read svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+    /* ── NATIVE AD SLOT (between rows) ── */
+    .ad-native-slot {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+      padding: 10px 0;
+    }
+
+    /* ── NO RESULTS ── */
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: none;
+    }
+    .no-results.visible { display: block; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p { font-size: 0.75rem; color: var(--muted); }
+    footer a { color: var(--red); text-decoration: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .manga-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .hero h1 { font-size: 2.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     ADSTERRA — SOCIAL BAR (paste your code here)
+════════════════════════════════════════════ -->
+<div class="social-bar-ad">
+  <script src="https://heeddialscary.com/1d/22/a7/1d22a7c82d4f4c6f0dc6a49f7d1bdbb4.js"></script>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <a class="logo" href="#"><span>Story</span>Zenkai</a>
+  <a class="yt-btn" href="https://youtube.com/@YOUR_CHANNEL" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+    Watch on YouTube
+  </a>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <p class="hero-eyebrow">StoryZenkai Manga Library</p>
+  <h1>Every Manga<br/>We've <em>Covered</em></h1>
+  <p>Watch our YouTube explanations then dive straight into the manga. All free reading links, all in one place.</p>
+</section>
+
+<!-- ═══ SEARCH ═══ -->
+<div class="search-wrap">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    <input type="text" id="searchInput" placeholder="Search manga title…" autocomplete="off"/>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ADSTERRA — DISPLAY BANNER 300x250
+════════════════════════════════════════════ -->
+<div class="ad-banner-top">
+  <script>
+    atOptions = {
+      'key' : 'd1596a24ede2b4ed58e57f01dac7cfff',
+      'format' : 'iframe',
+      'height' : 250,
+      'width' : 300,
+      'params' : {}
+    };
+  </script>
+  <script src="https://heeddialscary.com/d1596a24ede2b4ed58e57f01dac7cfff/invoke.js"></script>
+</div>
+
+<!-- ═══ MANGA GRID ═══ -->
+<section class="grid-section">
+  <p class="section-label">All Manga</p>
+  <div class="manga-grid" id="mangaGrid"></div>
+  <p class="no-results" id="noResults">No manga found for "<span id="searchTerm"></span>"</p>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <p>© 2025 StoryZenkai. We link to free reading platforms only.</p>
+  <p>Made with ❤️ for manga fans · <a href="https://youtube.com/@YOUR_CHANNEL" target="_blank">YouTube Channel</a></p>
+</footer>
+
+<script>
+  /* ═══════════════════════════════════════════════════════
+     ✏️  HOW TO ADD A NEW MANGA:
+     Copy one object below, paste it at the end of the list,
+     fill in the 4 fields. That's it!
+  ═══════════════════════════════════════════════════════ */
+  const MANGA_LIST = [
+    /* ✏️ HOW TO ADD A NEW MANGA:
+       1. Copy one block below and paste before the closing ];
+       2. Fill in: title, slug (lowercase-hyphens), cover, description
+       3. Also add the same slug in manga.html MANGA_DB with full details + videos
+       slug must match exactly between both files! */
+
+    {
+      title: "One Piece",
+      slug: "one-piece",
+      cover: "https://upload.wikimedia.org/wikipedia/en/9/90/One_Piece%2C_Volume_61_Cover_%28Japanese%29.jpg",
+      description: "Monkey D. Luffy sails the seas to find the legendary One Piece and become King of the Pirates.",
+    },
+    {
+      title: "Naruto",
+      slug: "naruto",
+      cover: "https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg",
+      description: "A young ninja with a demon fox sealed inside him dreams of becoming the greatest Hokage.",
+    },
+    {
+      title: "Attack on Titan",
+      slug: "attack-on-titan",
+      cover: "https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg",
+      description: "Humanity fights for survival inside massive walls against man-eating giants called Titans.",
+    },
+    {
+      title: "Demon Slayer",
+      slug: "demon-slayer",
+      cover: "https://upload.wikimedia.org/wikipedia/en/4/47/Demon_slayer_manga_volume_1.jpg",
+      description: "Tanjiro trains to become a Demon Slayer and find a cure for his sister turned into a demon.",
+    },
+    {
+      title: "Death Note",
+      slug: "death-note",
+      cover: "https://upload.wikimedia.org/wikipedia/en/e/ea/Death_Note%2C_volume_1_cover.jpg",
+      description: "A genius student finds a supernatural notebook that kills anyone whose name is written in it.",
+    },
+    {
+      title: "Jujutsu Kaisen",
+      slug: "jujutsu-kaisen",
+      cover: "https://upload.wikimedia.org/wikipedia/en/8/8d/Jujutsu_Kaisen_volume_1.jpg",
+      description: "Yuji Itadori joins a secret school of sorcerers who fight cursed spirits threatening humanity.",
+    },
+  ];
+
+  /* ═══ RENDER ═══ */
+  const grid = document.getElementById('mangaGrid');
+  const noResults = document.getElementById('noResults');
+  const searchTerm = document.getElementById('searchTerm');
+  const NATIVE_AD_AFTER = 4; // insert native ad after every N cards
+
+  // Native ad HTML
+  const nativeAdHTML = `
+    <div class="ad-native-slot">
+      <script async="async" data-cfasync="false" src="https://heeddialscary.com/9cf9b4a0f4838e5f934c41ed78a7e39c/invoke.js"><\/script>
+      <div id="container-9cf9b4a0f4838e5f934c41ed78a7e39c"></div>
+    </div>`;
+
+  function renderCards(list) {
+    grid.innerHTML = '';
+    if (list.length === 0) {
+      noResults.classList.add('visible');
+      return;
+    }
+    noResults.classList.remove('visible');
+
+    list.forEach((manga, i) => {
+      // Insert native ad slot after every NATIVE_AD_AFTER cards
+      if (i > 0 && i % NATIVE_AD_AFTER === 0) {
+        const adRow = document.createElement('div');
+        adRow.className = 'ad-native-slot';
+        adRow.innerHTML = `
+          <script async="async" data-cfasync="false" src="https://heeddialscary.com/9cf9b4a0f4838e5f934c41ed78a7e39c/invoke.js"><\/script>
+          <div id="container-native-${i}"></div>`;
+        grid.appendChild(adRow);
+      }
+
+      const card = document.createElement('div');
+      card.className = 'manga-card';
+      card.style.cursor = 'pointer';
+      card.onclick = () => window.location.href = `manga.html?name=${manga.slug}`;
+      card.innerHTML = `
+        ${manga.cover
+          ? `<img class="card-cover" src="${manga.cover}" alt="${manga.title}" loading="lazy"/>`
+          : `<div class="card-cover-placeholder">${manga.title}</div>`
+        }
+        <div class="card-body">
+          <div class="card-title">${manga.title}</div>
+          <div class="card-desc">${manga.description}</div>
+          <div class="card-actions">
+            <a class="btn-watch" href="manga.html?name=${manga.slug}">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+              View Details
+            </a>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  renderCards(MANGA_LIST);
+
+  /* ═══ SEARCH ═══ */
+  document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.trim().toLowerCase();
+    searchTerm.textContent = this.value.trim();
+    if (!q) { renderCards(MANGA_LIST); return; }
+    const filtered = MANGA_LIST.filter(m => m.title.toLowerCase().includes(q));
+    renderCards(filtered);
+  });
+</script>
+</body>
+</html>
