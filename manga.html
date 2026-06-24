@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StoryZenkai — Manga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0d0f; --surface: #16161a; --border: #2a2a32;
+      --ink: #e8e8f0; --muted: #7a7a8c; --red: #e8312a;
+      --red-dim: #9e1f1a; --yellow: #f5c518;
+    }
+    body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 5%; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(13,13,15,0.95);
+      backdrop-filter: blur(8px); z-index: 100;
+    }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; letter-spacing: 2px; color: var(--ink); text-decoration: none; }
+    .logo span { color: var(--red); }
+    .back-btn {
+      display: flex; align-items: center; gap: 6px; color: var(--muted);
+      text-decoration: none; font-size: 0.82rem; font-weight: 600;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--ink); }
+    .back-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+    /* AD TOP */
+    .ad-top { display: flex; justify-content: center; padding: 24px 5% 0; }
+
+    /* MANGA HERO */
+    .manga-hero {
+      display: flex; gap: 32px; padding: 36px 5%;
+      max-width: 900px; margin: 0 auto;
+      align-items: flex-start;
+    }
+    .manga-cover {
+      width: 180px; min-width: 180px; aspect-ratio: 2/3;
+      object-fit: cover; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #1e1e24;
+    }
+    .manga-cover-placeholder {
+      width: 180px; min-width: 180px; aspect-ratio: 2/3;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: linear-gradient(135deg,#1e1e24,#2a2a35);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1rem;
+      color: var(--muted); text-align: center; padding: 12px;
+    }
+    .manga-info { flex: 1; }
+    .manga-genre {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--red); margin-bottom: 10px;
+    }
+    .manga-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: 1px; line-height: 1; margin-bottom: 14px;
+    }
+    .manga-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 24px; }
+    .action-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-watch, .btn-read {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px; border-radius: 5px; font-size: 0.85rem;
+      font-weight: 600; text-decoration: none; transition: opacity 0.15s;
+    }
+    .btn-watch { background: var(--red); color: #fff; }
+    .btn-read  { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+    .btn-watch:hover, .btn-read:hover { opacity: 0.82; }
+    .btn-watch svg, .btn-read svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* AD MIDDLE */
+    .ad-middle { display: flex; justify-content: center; padding: 32px 5%; }
+
+    /* EPISODES / CHAPTERS SECTION */
+    .chapters-section { padding: 0 5% 60px; max-width: 900px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .video-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden; text-decoration: none;
+      color: var(--ink); transition: border-color 0.18s, transform 0.18s;
+      display: flex; flex-direction: column;
+    }
+    .video-card:hover { border-color: var(--red); transform: translateY(-3px); }
+    .video-thumb {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      background: #1e1e24; display: block;
+    }
+    .video-thumb-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: linear-gradient(135deg,#1e1e24,#2a2a35);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .video-thumb-placeholder svg { width: 40px; height: 40px; fill: var(--red); opacity: 0.6; }
+    .video-info { padding: 12px; }
+    .video-ep { font-size: 0.68rem; color: var(--red); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+    .video-title { font-size: 0.85rem; font-weight: 600; line-height: 1.4; }
+
+    /* NOT FOUND */
+    .not-found {
+      text-align: center; padding: 100px 20px;
+    }
+    .not-found h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--red); margin-bottom: 12px; }
+    .not-found p { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+    .not-found a { color: var(--red); text-decoration: none; font-weight: 600; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 24px 5%;
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    footer p { font-size: 0.75rem; color: var(--muted); }
+    footer a { color: var(--red); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .manga-hero { flex-direction: column; gap: 20px; }
+      .manga-cover, .manga-cover-placeholder { width: 100%; min-width: unset; }
+      .video-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SOCIAL BAR AD -->
+<script src="https://heeddialscary.com/1d/22/a7/1d22a7c82d4f4c6f0dc6a49f7d1bdbb4.js"></script>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="index.html"><span>Story</span>Zenkai</a>
+  <a class="back-btn" href="index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    All Manga
+  </a>
+</nav>
+
+<!-- AD TOP -->
+<div class="ad-top">
+  <script>
+    atOptions = {
+      'key' : 'd1596a24ede2b4ed58e57f01dac7cfff',
+      'format' : 'iframe',
+      'height' : 250,
+      'width' : 300,
+      'params' : {}
+    };
+  </script>
+  <script src="https://heeddialscary.com/d1596a24ede2b4ed58e57f01dac7cfff/invoke.js"></script>
+</div>
+
+<div id="pageContent"></div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 StoryZenkai. We link to free reading platforms only.</p>
+  <p><a href="index.html">← Back to Home</a></p>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ✏️  MANGA DATABASE
+   To add a new manga:
+   1. Add entry to MANGA_LIST in index.html (for home page card)
+   2. Add same slug here with full details + videos list
+
+   slug = URL-friendly name (lowercase, hyphens, no spaces)
+═══════════════════════════════════════════════════════════════ */
+const MANGA_DB = {
+
+  "one-piece": {
+    title: "One Piece",
+    genre: "Adventure · Shounen",
+    cover: "https://upload.wikimedia.org/wikipedia/en/9/90/One_Piece%2C_Volume_61_Cover_%28Japanese%29.jpg",
+    description: "Monkey D. Luffy sets sail to find the legendary treasure known as the 'One Piece' and become the King of the Pirates. Along the way he builds a crew of uniquely skilled companions in a world of Devil Fruits, Marine justice, and ancient secrets.",
+    readLink: "https://mangaplus.shueisha.co.jp/titles/100020",
+    videos: [
+      {
+        episode: "Part 1",
+        title: "East Blue Saga Explained",
+        thumb: "",   // ← paste YouTube thumbnail URL or leave blank
+        link: "https://youtube.com/@YOUR_CHANNEL"
+      },
+      {
+        episode: "Part 2",
+        title: "Alabasta Arc Explained",
+        thumb: "",
+        link: "https://youtube.com/@YOUR_CHANNEL"
+      }
+    ]
+  },
+
+  "naruto": {
+    title: "Naruto",
+    genre: "Action · Shounen",
+    cover: "https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg",
+    description: "Naruto Uzumaki, a young ninja shunned by his village for harboring a powerful demon fox, dreams of becoming the greatest Hokage. A story of determination, friendship, and the cycle of hatred.",
+    readLink: "https://mangaplus.shueisha.co.jp/titles/100011",
+    videos: [
+      {
+        episode: "Part 1",
+        title: "Naruto's Origin Explained",
+        thumb: "",
+        link: "https://youtube.com/@YOUR_CHANNEL"
+      }
+    ]
+  },
+
+  "attack-on-titan": {
+    title: "Attack on Titan",
+    genre: "Dark Fantasy · Action",
+    cover: "https://upload.wikimedia.org/wikipedia/en/d/d6/Shingeki_no_Kyojin_manga_volume_1.jpg",
+    description: "In a world where humanity hides behind massive walls to escape man-eating giants called Titans, Eren Yeager vows revenge after witnessing his mother's death — only to discover the terrifying truth of his world.",
+    readLink: "https://mangadex.org/title/304ceac3-8cdb-4fe7-acf7-2b6ff7a60613",
+    videos: [
+      {
+        episode: "Part 1",
+        title: "Attack on Titan Full Story Explained",
+        thumb: "",
+        link: "https://youtube.com/@YOUR_CHANNEL"
+      }
+    ]
+  },
+
+  "demon-slayer": {
+    title: "Demon Slayer",
+    genre: "Action · Supernatural",
+    cover: "https://upload.wikimedia.org/wikipedia/en/4/47/Demon_slayer_manga_volume_1.jpg",
+    description: "Tanjiro Kamado's life is shattered when demons slaughter his family and turn his sister Nezuko into one. He joins the Demon Slayer Corps to hunt demons and find a cure for his sister.",
+    readLink: "https://mangaplus.shueisha.co.jp/titles/100009",
+    videos: [
+      {
+        episode: "Part 1",
+        title: "Demon Slayer Full Story Explained",
+        thumb: "",
+        link: "https://youtube.com/@YOUR_CHANNEL"
+      }
+    ]
+  },
+
+  "death-note": {
+    title: "Death Note",
+    genre: "Thriller · Psychological",
+    cover: "https://upload.wikimedia.org/wikipedia/en/e/ea/Death_Note%2C_volume_1_cover.jpg",
+    description: "Light Yagami discovers a supernatural notebook that kills anyone whose name is written in it. He decides to use it to rid the world of criminals — beginning a deadly cat-and-mouse game with the world's greatest detective.",
+    readLink: "https://mangaplus.shueisha.co.jp/titles/100010",
+    videos: [
+      {
+        episode: "Part 1",
+        title: "Death Note Full Story Explained",
+        thumb: "",
+        link: "https://youtube.com/@YOUR_CHANNEL"
+      }
+    ]
+  },
+
+  "jujutsu-kaisen": {
+    title: "Jujutsu Kaisen",
+    genre: "Action · Supernatural",
+    cover: "https://upload.wikimedia.org/wikipedia/en/8/8d/Jujutsu_Kaisen_volume_1.jpg",
+    description: "Yuji Itadori swallows a cursed finger of the most powerful demon to save his friends — and is thrown into the world of Jujutsu sorcerers who battle cursed spirits threatening humanity.",
+    readLink: "https://mangaplus.shueisha.co.jp/titles/100034",
+    videos: [
+      {
+        episode: "Part 1",
+        title: "Jujutsu Kaisen Full Story Explained",
+        thumb: "",
+        link: "https://youtube.com/@YOUR_CHANNEL"
+      }
+    ]
+  }
+
+  /* ✏️ ADD NEW MANGA BELOW THIS LINE:
+  ,
+  "manga-slug": {
+    title: "Manga Title",
+    genre: "Genre · Tags",
+    cover: "cover image URL",
+    description: "Description here.",
+    readLink: "https://reading-site-link",
+    videos: [
+      {
+        episode: "Part 1",
+        title: "Your Video Title",
+        thumb: "YouTube thumbnail URL",
+        link: "https://youtube.com/watch?v=..."
+      }
+    ]
+  }
+  */
+};
+
+/* ═══ RENDER PAGE ═══ */
+function getSlug() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('name') || '';
+}
+
+function render() {
+  const slug = getSlug();
+  const manga = MANGA_DB[slug];
+  const content = document.getElementById('pageContent');
+
+  if (!manga) {
+    content.innerHTML = `
+      <div class="not-found">
+        <h2>Manga Not Found</h2>
+        <p>We haven't added this manga yet. Check back soon!</p>
+        <a href="index.html">← Browse All Manga</a>
+      </div>`;
+    return;
+  }
+
+  // Update page title
+  document.title = `${manga.title} — StoryZenkai`;
+
+  const coverHTML = manga.cover
+    ? `<img class="manga-cover" src="${manga.cover}" alt="${manga.title}"/>`
+    : `<div class="manga-cover-placeholder">${manga.title}</div>`;
+
+  const videosHTML = manga.videos.map(v => `
+    <a class="video-card" href="${v.link}" target="_blank" rel="noopener">
+      ${v.thumb
+        ? `<img class="video-thumb" src="${v.thumb}" alt="${v.title}"/>`
+        : `<div class="video-thumb-placeholder">
+             <svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.8 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+           </div>`
+      }
+      <div class="video-info">
+        <div class="video-ep">${v.episode}</div>
+        <div class="video-title">${v.title}</div>
+      </div>
+    </a>`).join('');
+
+  content.innerHTML = `
+    <div class="manga-hero">
+      ${coverHTML}
+      <div class="manga-info">
+        <p class="manga-genre">${manga.genre}</p>
+        <h1 class="manga-title">${manga.title}</h1>
+        <p class="manga-desc">${manga.description}</p>
+        <div class="action-row">
+          <a class="btn-read" href="${manga.readLink}" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+            Read Manga Free
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-middle">
+      <script async="async" data-cfasync="false" src="https://heeddialscary.com/9cf9b4a0f4838e5f934c41ed78a7e39c/invoke.js"><\/script>
+      <div id="container-9cf9b4a0f4838e5f934c41ed78a7e39c"></div>
+    </div>
+
+    <div class="chapters-section">
+      <p class="section-label">Our Explanations</p>
+      <div class="video-grid">${videosHTML}</div>
+    </div>`;
+}
+
+render();
+</script>
+</body>
+</html>
